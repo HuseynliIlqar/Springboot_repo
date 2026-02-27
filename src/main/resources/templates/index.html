@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Portfolio</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-dark text-white">
+<div class="container mt-4">
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>💼 My Portfolio</h2>
+        <form th:action="@{/logout}" method="post">
+            <button class="btn btn-outline-danger btn-sm">Çıxış</button>
+        </form>
+    </div>
+
+    <!-- Fund Calculator -->
+    <div class="card bg-secondary mb-4">
+        <div class="card-body">
+            <h5>💰 Fund Məlumatı</h5>
+            <p>Ümumi: <strong th:text="'$' + ${fund.totalAmount}"></strong></p>
+            <p>Mövcud: <strong th:text="'$' + ${fund.availableAmount}"></strong></p>
+
+            <form th:action="@{/fund/add}" method="post" class="d-flex gap-2">
+                <input type="number" name="amount" class="form-control w-25" placeholder="Məbləğ" required>
+                <button class="btn btn-success">Fonda əlavə et</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Filter -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5>📊 İnvestisiyalar</h5>
+        <div class="d-flex gap-2">
+            <a th:href="@{/?sort=asc}" class="btn btn-sm btn-outline-light">💲 Artan</a>
+            <a th:href="@{/?sort=desc}" class="btn btn-sm btn-outline-light">💲 Azalan</a>
+            <a th:href="@{/?sort=alpha}" class="btn btn-sm btn-outline-light">🔤 A-Z</a>
+        </div>
+    </div>
+
+    <!-- Investment Kartları -->
+    <div class="row mb-4">
+        <div class="col-md-4 mb-3" th:each="inv : ${investments}">
+            <div class="card bg-secondary">
+                <div class="card-body">
+                    <h5 th:text="${inv.name}"></h5>
+                    <p th:text="'$' + ${inv.amount}"></p>
+                    <p class="text-muted" th:text="${inv.sector}"></p>
+                    <a th:href="@{/investment/{id}(id=${inv.id})}" class="btn btn-sm btn-primary">Detay</a>
+
+                    <!-- Ad update -->
+                    <form th:action="@{/investment/update/{id}(id=${inv.id})}" method="post" class="mt-2 d-flex gap-1">
+                        <input type="text" name="name" class="form-control form-control-sm" placeholder="Yeni ad">
+                        <button class="btn btn-sm btn-warning">✏️</button>
+                    </form>
+
+                    <!-- Sil -->
+                    <form th:action="@{/investment/delete/{id}(id=${inv.id})}" method="post"
+                          onsubmit="return confirm('Silmək istədiyinizə əminsiniz?')">
+                        <button class="btn btn-sm btn-danger mt-1">🗑️ Sil</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Yeni Investment -->
+    <div class="card bg-secondary">
+        <div class="card-body">
+            <h5>➕ Yeni İnvestisiya</h5>
+            <form th:action="@{/investment/add}" method="post">
+                <div class="row g-2">
+                    <div class="col-md-3">
+                        <input type="text" name="name" class="form-control" placeholder="Ad" required>
+                    </div>
+                    <div class="col-md-2">
+                        <input type="number" name="amount" class="form-control" placeholder="Məbləğ" required>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="text" name="description" class="form-control" placeholder="Açıqlama">
+                    </div>
+                    <div class="col-md-2">
+                        <input type="text" name="sector" class="form-control" placeholder="Sektor">
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-success w-100">Əlavə et</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+<div th:if="${newInvestment}" id="investmentAdded" style="display:none"></div>
+
+<div id="notification" class="alert alert-success position-fixed bottom-0 end-0 m-3 d-none">
+    ✅ Yeni investisiya əlavə edildi!
+</div>
+
+<script>
+    if (document.getElementById('investmentAdded')) {
+        const notif = document.getElementById('notification');
+        setTimeout(() => {
+            notif.classList.remove('d-none');   // 2 dəq sonra göstər
+            setTimeout(() => {
+                notif.classList.add('d-none');  // 4 san sonra gizlət
+            }, 4000);
+        }, 120000); // ← 120000ms = 2 dəqiqə
+    }
+</script>
+</body>
+</html>
